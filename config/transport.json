@@ -1,0 +1,19 @@
+{
+	"development":{
+		"type":"sendmail",
+		"transportoptions":{
+			"debug":true,
+			"args":["-t","-i"]
+		}
+	},
+	"development-example2":{
+		"type":"SMTP",
+		"transportoptions":{
+			"service": "SendGrid",
+		  "auth": {
+        "user": "username",
+        "pass": "password"
+		  }
+		}
+	}
+}

@@ -1,0 +1,27 @@
+<% include ../shared/header %>
+<div class="ts-container">
+  <div class="ts-row">
+    <div class="ts-col-span8 ts-col-nofloat ts-screenmd-col-span12 ts-screensm-col-span12 ts-no-heading-margin ts-screenxs-col-span12">
+      <h2 class="text-left"> 2-Step Verification Setup</h2>
+
+        <div class="ts-row ts-form-row">
+          <div class="ts-col-span6 ts-screensm-col-span12 ts-screenxs-col-span12">
+            <p>Scan this QR Code in <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">Google Authenticator</a></p>
+            <div class="ts-width-75">
+              <%- svg_string %>
+            </div>
+          </div>
+          <div class="ts-col-span6 ts-screensm-col-span12 ts-screenxs-col-span12">
+            <p>- or enter this key manually -</p>
+            <b><%= key %></b>
+          </div>
+        </div>
+        <div class="ts-row ts-form-row ts-text-center">
+  <hr>
+  <p>Once you've added your MFA Token, continue to login</p>
+          <a href="/auth/login-otp" class="ts-button ts-text-lg ts-button-accent-color ">Multi-factor login</a>
+        </div>
+    </div>
+  </div>
+</div>
+<% include ../shared/footer %>
