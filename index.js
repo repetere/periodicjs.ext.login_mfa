@@ -1,12 +1,12 @@
 'use strict';
 
 /**
- * A basic mailer extension that allows for you to configure custom mail transports, and sends mail via nodemailer.
+ * Login Multi Factor Authentication (MFA) uses Passportjs' passport_totp authentication stategy to provide TOTP(Time-based One-time Password Algorithm) for Express based periodicjs applications.
  * @{@link https://github.com/typesettin/periodicjs.ext.mailer}
  * @author Yaw Joseph Etse
- * @copyright Copyright (c) 2014 Typesettin. All rights reserved.
+ * @copyright Copyright (c) 2015 Typesettin. All rights reserved.
  * @license MIT
- * @exports periodicjs.ext.mailer
+ * @exports periodicjs.ext.login_mfa
  * @requires module:path
  * @param  {object} periodic variable injection of resources from current periodic instance
  */

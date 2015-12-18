@@ -1,7 +1,7 @@
 {
   "name": "periodicjs.ext.login_mfa",
-  "description": "multi-factor/two-factor authentication for periodicjs",
-  "version": "5.0.0",
+  "description": "Login Multi Factor Authentication (MFA) uses Passportjs' passport_totp authentication stategy to provide TOTP(Time-based One-time Password Algorithm) for Express based periodicjs applications.",
+  "version": "5.1.0",
   "main": "index.js",
   "engines": {
     "node": ">=0.10.x"

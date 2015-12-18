@@ -1,59 +1,57 @@
-# periodicjs.ext.mailer
+# periodicjs.ext.login_mfa
 
-A basic mailer extension that allows for you to configure custom mail transports, and sends mail via nodemailer.
+Login Multi Factor Authentication (MFA) uses Passportjs' passport_totp authentication stategy to provide TOTP(Time-based One-time Password Algorithm) for Express based periodicjs applications.
 
- [API Documentation](https://github.com/typesettin/periodicjs.ext.mailer/blob/master/doc/api.md)
+ [API Documentation](https://github.com/typesettin/periodicjs.ext.login_mfa/blob/master/doc/api.md)
 
 ## Installation
 
 ```
-$ npm install periodicjs.ext.mailer
+$ npm install periodicjs.ext.login_mfa
 ```
 
+## Usage & Configuration
 
-## Usage
+All you need to do is enable the extension and then add `"requiremfa":true` to your login extension's configuration. 
 
-### Sending Test Mail Routes
-*JavaScript*
-```javascript
-module.exports = function(periodic){
-	var mailRouter = periodic.express.Router(),
-			mailController = require('./controller/mailer')(periodic);
-	mailRouter.post('/testmail', mailController.sendmail);
-	periodic.app.use('/p-admin/mailer',mailRouter);
-};
-```
-## Configure
+Login_MFA creates the key and defines the time period for a TOTP authentication token generator like Google Authenticator.
 
-you can define your own nodemailer transports, after the extension has been installed, the transport configuration is located in `content/config/extensions/periodicjs.ext.mailer/transport.json`
+### Example Login Extension Configuration
 
-### Example Transports
+**settings.json**
+`content/config/extensions/periodicjs.ext.login/settings.json`
 
-**tranport.json**
-These are [nodemailer](http://www.nodemailer.com/) transports.
-
-```javascript
+```json
 {
-	"development":{
-		"type":"sendmail",
-		"transportoptions":{
-			"debug":true,
-			"args":["-t","-i"]
-		}
-	},
-	"development-example2":{
-		"type":"SMTP",
-		"transportoptions":{
-			"service": "SendGrid",
-		  "auth": {
-        "user": "username",
-        "pass": "password"
-		  }
+	"production":{
+		"settings":{
+      "authLoginPath":"/auth/login",
+      "authLogoutPath":"/",
+			"authLoggedInHomepage":"/p-admin",
+			"forgotPasswordEmailNotificationSubject":"Your Account Password has been reset",
+			"usepassword":true,
+			"requiremfa":true
+		},
+		"new_user_validation": {
+			"checkusername": false,
+			"checkpassword": true,
+			"length_of_username": 1,
+			"length_of_password": 8,
+			"send_new_user_email": true
+		},
+		"passport":{
+			"oauth":{
+				"facebook":{
+					"appid": "FBAPPID",
+					"appsecret": "FBAPPSECRET",
+					"callbackurl": "http://local.getperiodic.com:8786/auth/facebook/callback",
+					"scope":["email", "publish_actions", "offline_access", "user_status", "user_likes", "user_checkins", "user_about_me", "read_stream"]
+				}
+			}
 		}
 	}
 }
 ```
-
 
 ##Development
 *Make sure you have grunt installed*
