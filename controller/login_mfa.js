@@ -126,7 +126,7 @@ var mfa_setup_page = function(req,res){
 		}
    else if (obj && obj.key) {
    		if(obj.allow_new_code!==true){
-   			var mfaError = new Error('User is not accessible to new mfa token setup');
+   			var mfaError = new Error('User is not accessible to new mfa token setup, please contact your admin');
    			logger.error(mfaError);
    			CoreController.handleDocumentQueryErrorResponse({
 					err: mfaError,
