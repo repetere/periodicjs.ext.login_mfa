@@ -1,10 +1,15 @@
 {
 	"periodicCompatibility":"5.0.0",
-	"periodicDependencies": [],
-	"periodicjs.ext.asyncadmin": {
-		"menu": {
-			"Extensions": {
-				"mailer": {
+	"periodicDependencies": [    
+	{
+      "extname":"periodicjs.ext.login",
+      "version":"~5.9.9"
+    }
+    ],
+	"periodicjs.ext.asyncadmin_temp": {
+		"menu_temp": {
+			"Extensions_temp": {
+				"mailer_temp": {
 					"userprivilege":"110",
 					"tree-item": "file",
 			    "tree-item-label": "Test Emails",
