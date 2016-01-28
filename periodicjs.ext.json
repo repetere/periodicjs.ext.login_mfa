@@ -6,18 +6,19 @@
       "version":"~5.9.9"
     }
     ],
-	"periodicjs.ext.asyncadmin_temp": {
-		"menu_temp": {
-			"Extensions_temp": {
-				"mailer_temp": {
+	"periodicjs.ext.asyncadmin": {
+		"menu": {
+			"Extensions": {
+				"mfa": {
 					"userprivilege":"110",
 					"tree-item": "file",
-			    "tree-item-label": "Test Emails",
-			    "tree-item-id": "ext.mailer",
-			    "tree-item-link": "/%locals.adminPath%/mailer/test",
+			    "tree-item-label": "Multi-Factor Authentication",
+			    "tree-item-id": "ext.login-mfa",
+			    "tree-item-link": "/auth/login-mfa",
 			    "tree-item-attributes": {
 			      "class": "async-admin-ajax-link",
-			      "title": "Test email settings"
+			      "title": "Login MFA",
+            "style": "background-image: url(/images/adminui/svg/shield89.svg);"
 			    }
 				}
 			}

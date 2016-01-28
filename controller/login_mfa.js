@@ -37,7 +37,7 @@ var totp_callback = function(req,res,next){
  * @return {null}        does not return a value
  */
 var totp_success = function(req,res){
-	var loginUrl = (req.session.return_url) ? req.session.return_url : loginExtSettings.settings.authLoggedInHomepage;
+	var loginUrl = (req.session.return_url && req.session.return_url!=='/auth/login-otp') ? req.session.return_url : loginExtSettings.settings.authLoggedInHomepage;
 	req.session.secondFactor = 'totp';
 
 	res.redirect(loginUrl);
@@ -95,6 +95,7 @@ var saveKeyForUserId = function(userid, keydata, cb) {
 		}
 		else {
 			user.markModified('extensionattributes');
+			user.extensionattributes = user.extensionattributes || {};
 			user.extensionattributes.login_mfa = keydata;
 			user.extensionattributes.login_mfa.allow_new_code = false;
 
@@ -360,6 +361,47 @@ var ensureAuthenticated = function (req, res, next) {
 	}
 };
 
+var userEditor = function(req,res,next){
+	var viewtemplate = {
+			viewname: 'p-admin/loginmfa/index',
+			themefileext: appSettings.templatefileextension,
+			extname: 'periodicjs.ext.login_mfa'
+		},
+		viewdata = merge(req.controllerData, {
+			pagedata: {
+				title: 'Login MFA',
+				toplink: '&raquo; Login MFA',
+				extensions: CoreUtilities.getAdminMenu()
+			},
+			user: req.user
+		});
+	CoreController.renderView(req, res, viewtemplate, viewdata);
+};
+
+var set_mfa_status = function (req,res,next) {
+	req.controllerData = req.controllerData || {};
+	req.controllerData.checkuservalidation = loginExtSettings.new_user_validation;
+	req.controllerData.checkuservalidation.useComplexity = loginExtSettings.complexitySettings.useComplexity;
+	req.controllerData.checkuservalidation.complexity = loginExtSettings.complexitySettings.settings.weak;
+
+	// req.body = req.controllerData.user;
+	req.body.docid = req.controllerData.user._id;
+	req.body.accounttype = req.controllerData.user.accounttype;
+	req.body.email = req.controllerData.user.email;
+	req.body.attributes = req.controllerData.user.attributes;
+	req.body.extensionattributes = req.controllerData.user.extensionattributes ||{};
+	if(req.params.set_mfa_status ==='enable_mfa'){
+		req.body.extensionattributes.login_mfa.allow_new_code = true;
+	}
+	else if(req.params.set_mfa_status ==='disable_mfa'){
+		req.body.extensionattributes.login_mfa.allow_new_code = false;
+	}
+
+	req.skippassword = true;
+	req.saverevision = false;
+	next();
+};
+
 /**
  * login mfa controller
  * @module loginMFAController
@@ -410,6 +452,8 @@ var controller = function(resources){
 		skip_mfa_check: skip_mfa_check,
 		mfa_login_page: mfa_login_page,
 		mfa_setup_page: mfa_setup_page,
+		userEditor: userEditor,
+		set_mfa_status: set_mfa_status,
 		ensureAuthenticated: ensureAuthenticated
 	};
 };

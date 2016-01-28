@@ -1,15 +1,45 @@
 {
-  "name": "periodicjs.ext.login_mfa",
-  "description": "Login Multi Factor Authentication (MFA) uses Passportjs' passport_totp authentication stategy to provide TOTP(Time-based One-time Password Algorithm) for Express based periodicjs applications.",
-  "version": "5.1.2",
-  "main": "index.js",
-  "engines": {
-    "node": ">=0.10.x"
-  },
-  "author": {
-    "name": "Yaw Joseph Etse",
+  "_args": [
+    [
+      "periodicjs.ext.login_mfa@5.1.2",
+      "/Users/yawetse/Developer/github/promise/promise-internal-server/node_modules/periodicjs"
+    ]
+  ],
+  "_from": "periodicjs.ext.login_mfa@5.1.2",
+  "_id": "periodicjs.ext.login_mfa@5.1.2",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/periodicjs.ext.login_mfa",
+  "_nodeVersion": "0.12.6",
+  "_npmUser": {
     "email": "yaw.etse@gmail.com",
+    "name": "yawetse"
+  },
+  "_npmVersion": "2.11.2",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "periodicjs.ext.login_mfa",
+    "raw": "periodicjs.ext.login_mfa@5.1.2",
+    "rawSpec": "5.1.2",
+    "scope": null,
+    "spec": "5.1.2",
+    "type": "version"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/periodicjs.ext.login_mfa/-/periodicjs.ext.login_mfa-5.1.2.tgz",
+  "_shasum": "7d88ef63bd9022d312ae98ee2b17fe49b45159b1",
+  "_shrinkwrap": null,
+  "_spec": "periodicjs.ext.login_mfa@5.1.2",
+  "_where": "/Users/yawetse/Developer/github/promise/promise-internal-server/node_modules/periodicjs",
+  "author": {
+    "email": "yaw.etse@gmail.com",
+    "name": "Yaw Joseph Etse",
     "url": "http://about.me/yawjosephetse"
+  },
+  "bugs": {
+    "url": "https://github.com/typesettin/periodicjs.ext.login_mfa/issues"
   },
   "contributors": [
     {
@@ -18,19 +48,12 @@
       "url": "https://github.com/janbialostok"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/typesettin/periodicjs.ext.login_mfa.git"
-  },
-  "scripts": {
-    "postinstall": "node install.js",
-    "postuninstall": "node uninstall.js"
-  },
   "dependencies": {
     "passport-totp": "0.0.2",
     "qr-image": "^3.1.0",
     "thirty-two": "^1.0.0"
   },
+  "description": "Login Multi Factor Authentication (MFA) uses Passportjs' passport_totp authentication stategy to provide TOTP(Time-based One-time Password Algorithm) for Express based periodicjs applications.",
   "devDependencies": {
     "browserify": "^10.2.4",
     "chai": "^3.0.0",
@@ -51,23 +74,36 @@
     "uglify-js": "^2.4.15",
     "uglifyify": "^3.0.1"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "7d88ef63bd9022d312ae98ee2b17fe49b45159b1",
+    "tarball": "http://registry.npmjs.org/periodicjs.ext.login_mfa/-/periodicjs.ext.login_mfa-5.1.2.tgz"
+  },
+  "engines": {
+    "node": ">=0.10.x"
+  },
+  "gitHead": "375af6c55cb0f06266bef4fea8d98d6245cb9e43",
+  "homepage": "https://github.com/typesettin/periodicjs.ext.login_mfa#readme",
   "keywords": [
     "periodicjs"
   ],
+  "main": "index.js",
   "maintainers": [
     {
       "name": "yawetse",
       "email": "yaw.etse@gmail.com"
     }
   ],
-  "readme": "# periodicjs.ext.login_mfa\n\nLogin Multi Factor Authentication (MFA) uses Passportjs' passport_totp authentication stategy to provide TOTP(Time-based One-time Password Algorithm) for Express based periodicjs applications.\n\n [API Documentation](https://github.com/typesettin/periodicjs.ext.login_mfa/blob/master/doc/api.md)\n\n## Installation\n\n```\n$ npm install periodicjs.ext.login_mfa\n```\n\n## Usage & Configuration\n\nAll you need to do is enable the extension and then add `\"requiremfa\":true` to your login extension's configuration. \n\nLogin_MFA creates the key and defines the time period for a TOTP authentication token generator like Google Authenticator.\n\n### Example Login Extension Configuration\n\n**settings.json**\n`content/config/extensions/periodicjs.ext.login/settings.json`\n\n```json\n{\n\t\"production\":{\n\t\t\"settings\":{\n      \"authLoginPath\":\"/auth/login\",\n      \"authLogoutPath\":\"/\",\n\t\t\t\"authLoggedInHomepage\":\"/p-admin\",\n\t\t\t\"forgotPasswordEmailNotificationSubject\":\"Your Account Password has been reset\",\n\t\t\t\"usepassword\":true,\n\t\t\t\"requiremfa\":true\n\t\t},\n\t\t\"new_user_validation\": {\n\t\t\t\"checkusername\": false,\n\t\t\t\"checkpassword\": true,\n\t\t\t\"length_of_username\": 1,\n\t\t\t\"length_of_password\": 8,\n\t\t\t\"send_new_user_email\": true\n\t\t},\n\t\t\"passport\":{\n\t\t\t\"oauth\":{\n\t\t\t\t\"facebook\":{\n\t\t\t\t\t\"appid\": \"FBAPPID\",\n\t\t\t\t\t\"appsecret\": \"FBAPPSECRET\",\n\t\t\t\t\t\"callbackurl\": \"http://local.getperiodic.com:8786/auth/facebook/callback\",\n\t\t\t\t\t\"scope\":[\"email\", \"publish_actions\", \"offline_access\", \"user_status\", \"user_likes\", \"user_checkins\", \"user_about_me\", \"read_stream\"]\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n```\n\n##Development\n*Make sure you have grunt installed*\n```\n$ npm install -g grunt-cli\n```\n\nThen run grunt watch\n```\n$ grunt watch\n```\nFor generating documentation\n```\n$ grunt doc\n$ jsdoc2md controller/**/*.js index.js install.js uninstall.js > doc/api.md\n```\n##Notes\n* Check out https://github.com/typesettin/periodicjs for the full Periodic Documentation",
-  "readmeFilename": "README.md",
-  "gitHead": "375af6c55cb0f06266bef4fea8d98d6245cb9e43",
-  "bugs": {
-    "url": "https://github.com/typesettin/periodicjs.ext.login_mfa/issues"
+  "name": "periodicjs.ext.login_mfa",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/typesettin/periodicjs.ext.login_mfa.git"
   },
-  "homepage": "https://github.com/typesettin/periodicjs.ext.login_mfa#readme",
-  "_id": "periodicjs.ext.login_mfa@5.1.1",
-  "_shasum": "fc0a129282c0f0d6f26d87eb441b7fe888da0171",
-  "_from": "periodicjs.ext.login_mfa@5.1.1"
+  "scripts": {
+    "postinstall": "node install.js",
+    "postuninstall": "node uninstall.js"
+  },
+  "version": "5.2.0"
 }
