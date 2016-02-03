@@ -3,7 +3,8 @@ var qr = require('qr-image');
 var	merge = require('utils-merge'),
 	TotpStrategy = require('passport-totp').Strategy,
 	base32 = require('thirty-two'),
-	User,
+	capitalize = require('capitalize'),
+	// User,
 	passport,
 	loginExtSettings,
 	appSettings,
@@ -12,7 +13,8 @@ var	merge = require('utils-merge'),
 	logger,
 	CoreUtilities,
 	CoreController,
-	CoreMailer;
+	CoreMailer,
+	Custom_User_Objects={};
 
 /**
  * passport totp configuration
@@ -21,7 +23,8 @@ var	merge = require('utils-merge'),
  * @return {Function} next() callback
  */
 var totp_callback = function(req,res,next){
-	loginExtSettings.settings.authMFALoginPath = '/auth/login-otp';
+	let adminPostRoute = res.locals.adminPostRoute || 'auth';
+	loginExtSettings.settings.authMFALoginPath = '/'+adminPostRoute+'/login-otp';
 	var loginFailureUrl = (req.session.return_url) ? req.session.return_url : loginExtSettings.settings.authMFALoginPath + '?return_url=' + req.session.return_url;
 
 	passport.authenticate('totp',{ 
@@ -37,7 +40,9 @@ var totp_callback = function(req,res,next){
  * @return {null}        does not return a value
  */
 var totp_success = function(req,res){
-	var loginUrl = (req.session.return_url && req.session.return_url!=='/auth/login-otp') ? req.session.return_url : loginExtSettings.settings.authLoggedInHomepage;
+	let adminPostRoute = res.locals.adminPostRoute || 'auth';
+
+	var loginUrl = (req.session.return_url && req.session.return_url!=='/'+adminPostRoute+'/login-otp') ? req.session.return_url : loginExtSettings.settings.authLoggedInHomepage;
 	req.session.secondFactor = 'totp';
 
 	res.redirect(loginUrl);
@@ -85,8 +90,9 @@ var findKeyForUserId =  function(user, fn) {
  * @param  {object}   keydata object that contains, key (MFA device key),period (TOTP timeout period) and allow_new_code (set to false)
  * @param  {Function} cb      callback function
  */
-var saveKeyForUserId = function(userid, keydata, cb) {
-	User.findOne({
+var saveKeyForUserId = function(userid, keydata, modelNameToUse, cb) {
+	let UserModelToUse = Custom_User_Objects[modelNameToUse];
+	UserModelToUse.findOne({
 		'_id': userid
 	}, function (err, user) {
 		if (err) {
@@ -116,6 +122,11 @@ var saveKeyForUserId = function(userid, keydata, cb) {
  * @return {null}        does not return a value
  */
 var mfa_setup_page = function(req,res){
+	// console.log('req.user',req.user);
+	if(!Custom_User_Objects[req.user.entitytype]){
+		Custom_User_Objects[req.user.entitytype] = mongoose.model(capitalize(req.user.entitytype));
+	}
+	let adminPostRoute = res.locals.adminPostRoute || 'auth';
 	var otpUrl,qrImage,encodedKey;
 	findKeyForUserId(req.user, function(err, obj) {
     if (err) { 
@@ -160,7 +171,8 @@ var svg_string = qr.imageSync((otpUrl), { type: 'svg' });
 					key: encodedKey, 
 					qrImage: qrImage,
 					svg_string: svg_string, 
-					user: req.user
+					user: req.user,
+					adminPostRoute: adminPostRoute
 				};
 
 			CoreController.renderView(req, res, viewtemplate, viewdata);
@@ -177,7 +189,7 @@ var svg_string = qr.imageSync((otpUrl), { type: 'svg' });
 var new_svg_string = qr.imageSync((otpUrl), { type: 'svg' });
       qrImage = 'https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=' + encodeURIComponent(otpUrl);
   
-      saveKeyForUserId(req.user, { key: key, period: 30 }, function(err) {
+      saveKeyForUserId(req.user, { key: key, period: 30 }, req.user.entitytype, function(err) {
         if (err) { 
         	CoreController.handleDocumentQueryErrorResponse({
 						err: err,
@@ -200,7 +212,8 @@ var new_svg_string = qr.imageSync((otpUrl), { type: 'svg' });
 							key: encodedKey, 
 							qrImage: qrImage, 
 							svg_string: new_svg_string,
-							user: req.user
+							user: req.user,
+							adminPostRoute: adminPostRoute
 						};
 
 					CoreController.renderView(req, res, viewtemplate, viewdata);
@@ -217,36 +230,38 @@ var new_svg_string = qr.imageSync((otpUrl), { type: 'svg' });
  * @return {null}        does not return a value
  */
 var mfa_login_page = function(req,res){
-    findKeyForUserId(req.user, function(err, obj) {
+	let adminPostRoute = res.locals.adminPostRoute || 'auth';
+  findKeyForUserId(req.user, function(err, obj) {
 	// console.log('obj',obj);
-      if (err) { 
-      	CoreController.handleDocumentQueryErrorResponse({
-					err: err,
-					res: res,
-					req: req
-				});
-      }
-      else if (!obj || (obj && !obj.key)) { 
-      	return res.redirect('/auth/login-otp-setup'); 
-      }
-      else{
-    		var viewtemplate = {
-						viewname: 'user/login-mfa-otp',
-						themefileext: appSettings.templatefileextension,
-						extname: 'periodicjs.ext.login_mfa'
+    if (err) { 
+    	CoreController.handleDocumentQueryErrorResponse({
+				err: err,
+				res: res,
+				req: req
+			});
+    }
+    else if (!obj || (obj && !obj.key)) { 
+    	return res.redirect('/'+adminPostRoute+'/login-otp-setup'); 
+    }
+    else{
+  		var viewtemplate = {
+					viewname: 'user/login-mfa-otp',
+					themefileext: appSettings.templatefileextension,
+					extname: 'periodicjs.ext.login_mfa'
+				},
+				viewdata = {
+					pagedata: {
+						title: 'Multi-Factor Authenticator',
+						toplink: '&raquo; Multi-Factor Authenticator',
+						extensions: CoreUtilities.getAdminMenu()
 					},
-					viewdata = {
-						pagedata: {
-							title: 'Multi-Factor Authenticator',
-							toplink: '&raquo; Multi-Factor Authenticator',
-							extensions: CoreUtilities.getAdminMenu()
-						},
-						user: req.user
-					};
+					user: req.user,
+					adminPostRoute: adminPostRoute
+				};
 
-				CoreController.renderView(req, res, viewtemplate, viewdata);
-      }
-    });
+			CoreController.renderView(req, res, viewtemplate, viewdata);
+    }
+  });
 };
 
 /**
@@ -286,6 +301,7 @@ var skip_mfa_check = function(req,res,next){
  * @return {Function} next() callback
  */
 var ensureAuthenticated = function (req, res, next) {
+	let adminPostRoute = res.locals.adminPostRoute || 'auth';
 	req.controllerData = (req.controllerData) ? req.controllerData : {};
 	/* if a user is logged in, and requires to link account, update the user document with social credentials and then pass to the next express middleware */
 	if (req.isAuthenticated()) {
@@ -318,27 +334,27 @@ var ensureAuthenticated = function (req, res, next) {
 			// res.redirect('/user/linkaccount?service='+req.session.linkaccountservice);
 		}
 		else if (loginExtSettings && loginExtSettings.settings.disablesocialsignin === true && req.user.accounttype === 'social-sign-in' && req.query.required !== 'social-sign-in' && req.method === 'GET') {
-			res.redirect('/auth/user/finishregistration?reason=social-sign-in-pending');
+			res.redirect('/'+adminPostRoute+'/user/finishregistration?reason=social-sign-in-pending');
 		}
 		else if (loginExtSettings && loginExtSettings.settings.requireusername !== false && !req.user.username && req.query.required !== 'username' && req.method === 'GET') {
-			res.redirect('/auth/user/finishregistration?required=username');
+			res.redirect('/'+adminPostRoute+'/user/finishregistration?required=username');
 			// return next();
 		}
 		else if (loginExtSettings && loginExtSettings.settings.requireemail !== false && !req.user.email && req.query.required !== 'email' && req.method === 'GET') {
-			res.redirect('/auth/user/finishregistration?required=email');
+			res.redirect('/'+adminPostRoute+'/user/finishregistration?required=email');
 		}
 		else if (loginExtSettings && loginExtSettings.settings.requireemail !== false && !req.user.email && req.query.required !== 'email' && req.method === 'GET') {
-			res.redirect('/auth/user/finishregistration?required=email');
+			res.redirect('/'+adminPostRoute+'/user/finishregistration?required=email');
 		}
 		else if (loginExtSettings && loginExtSettings.settings.requireuseractivation && req.user.activated === false && req.query.required !== 'activation' && req.method === 'GET') {
-			res.redirect('/auth/user/finishregistration?required=activation');
+			res.redirect('/'+adminPostRoute+'/user/finishregistration?required=activation');
 		}
 		else if(loginExtSettings && loginExtSettings.settings.requiremfa !== false && req.controllerData.skip_mfa_check!==true && req.method === 'GET'){
 			if (req.session.secondFactor === 'totp') { 
 				return next(); 
 			}
 			else{
-				res.redirect('/auth/login-otp');
+				res.redirect('/'+adminPostRoute+'/login-otp');
 			}
 		}
 		else {
@@ -427,7 +443,10 @@ var controller = function(resources){
 	loginExtSettings = resources.app.controller.extension.login.loginExtSettings;
 	CoreMailer = resources.core.mailer;
 	appenvironment = appSettings.application.environment;
-	User = mongoose.model('User');
+	Custom_User_Objects = {
+		'user' : mongoose.model('User')
+	};
+	// User = mongoose.model('User');
 
 
 	passport.use(new TotpStrategy(
