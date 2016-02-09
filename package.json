@@ -9,8 +9,8 @@
       "/Users/yawetse/Developer/github/promise/promise-internal-server/node_modules/periodicjs"
     ]
   ],
-  "_from": "periodicjs.ext.login_mfa@5.2.0",
-  "_id": "periodicjs.ext.login_mfa@5.2.0",
+  "_from": "periodicjs.ext.login_mfa@latest",
+  "_id": "periodicjs.ext.login_mfa@7.0.0",
   "_inCache": true,
   "_installable": true,
   "_location": "/periodicjs.ext.login_mfa",
@@ -36,8 +36,8 @@
   "_spec": "periodicjs.ext.login_mfa@5.2.0",
   "_where": "/Users/yawetse/Developer/github/promise/promise-internal-server/node_modules/periodicjs",
   "author": {
-    "email": "yaw.etse@gmail.com",
     "name": "Yaw Joseph Etse",
+    "email": "yaw.etse@gmail.com",
     "url": "http://about.me/yawjosephetse"
   },
   "bugs": {
@@ -107,5 +107,6 @@
     "postinstall": "node install.js",
     "postuninstall": "node uninstall.js"
   },
-  "version": "7.0.0"
+  "version": "7.0.1",
+  "_shasum": "65155dff5912a6da8589fdd149b36138633fd056"
 }

@@ -1,16 +1,25 @@
 <% include ../../shared/admin_header %>
-<% var genericdoctype = "User" %>
-<% var genericdoctypelink = "user" %>
-<% var genericdoctypeplurallink = "users" %>
-<% var genericdoccount = userscount %>
-<% var genericdocpages = userpages %>
+<% var genericdoctype = (request.originalurl === '/p-auth/login-mfa') ? "Account" : "User" %>
+<% var genericdoctypelink = (request.originalurl === '/p-auth/login-mfa') ? "account" : "user" %>
+<% var genericdoctypeplurallink = (request.originalurl === '/p-auth/login-mfa') ?"accounts" : "users" %>
+<% var genericdoccount = (request.originalurl === '/p-auth/login-mfa') ?  accountscount : userscount %>
+<% var genericdocs = (request.originalurl === '/p-auth/login-mfa') ?  accounts : users %>
+<% var genericdocpages = (request.originalurl === '/p-auth/login-mfa') ? accountpages : userpages %>
 <% var genericdoc_tktouse = "createdat,updatedat,username,email,firstname,lastname,birthday,accounttype,gender,primaryasset,assets,userroles,primaryauthor,coverimages,coverimage" %>
 <div class="ts-container">
   <div class="ts-page-content-container">
+  <style type="text/css">
+  a[href="/p-admin/user/new"].async-admin-ajax-link.ts-button.ts-pull-right{
+  	display: none;
+  }
+  </style>
+  <% if(locals.use_separate_accounts){ %>
+	  	<a class="async-admin-ajax-link ts-button  ts-pull-right" href="/p-auth/login-mfa">Manage Accounts MFA</a>
+	<% }; %>
     <% include ../../shared/admin_genericdoc_search_filters %>
     <input type="hidden" name="_csrf" value=<%- locals.token %> >
 		<%- locals.get_data_table_html({
-			data: users,
+			data: genericdocs,
 			data_attributes:[
 			 {label: 'Email',sortactive:true,sortid:'email',sortorder:'asc'},
 			 {label: 'Create Date',sortactive:true,sortid:'createdat',sortorder:'asc'},
@@ -21,9 +30,9 @@
 			 ],
 			responsive_table :true,
 			responsive_collapse: locals.default_responsive_collapse({getCollapseNameFunction:function(obj){return obj.email},
-				editlink: '/'+locals.adminPath+'/users/|||_id|||',
-				deletelink: '/'+locals.adminPath +'/users/|||_id|||/delete',
-				deleterefreshlink: '/'+locals.adminPath +'/users/'
+				editlink: '/'+locals.adminPath+'/'+genericdoctypeplurallink+'/|||_id|||',
+				deletelink: '/'+locals.adminPath +'/'+genericdoctypeplurallink+'/|||_id|||/delete',
+				deleterefreshlink: '/'+locals.adminPath +'/'+genericdoctypeplurallink+'/'
 			}),
 			responsive_expand:locals.default_responsive_expand(),
 			thead:locals.default_thead(),
@@ -33,17 +42,17 @@
 				html: function (obj) {
 					var jsontablehtml;
 					// jsontablehtml = '<td><a href="/' + options.adminPath + '/' + content_path + '/' + obj.identification.guid + '"  class="async-admin-ajax-link">' + obj.identification.guid + '</a></td>';
-					jsontablehtml = '<td><a href="/p-admin/user/' + obj._id + '/edit" class="async-admin-ajax-link">' + obj.email + '</a></td>'; 
+					jsontablehtml = '<td><a href="/p-admin/'+genericdoctypelink+'/' + obj._id + '/edit" class="async-admin-ajax-link">' + obj.email + '</a></td>'; 
 					jsontablehtml += '<td>' + new locals.viewhelper.moment(obj.createdat).format('MM/DD/YYYY |  hh:mm:ssa') + '</td>';
 					jsontablehtml += '<td>' + obj.activated + '</td>';
 					jsontablehtml += '<td>' + obj.accounttype + '</td>';
-					jsontablehtml += '<td><a href="/p-admin/user/' + obj._id + '/edit" class="async-admin-ajax-link">' + obj._id + '</a></td>';
+					jsontablehtml += '<td><a href="/p-admin/'+genericdoctypelink+'/' + obj._id + '/edit" class="async-admin-ajax-link">' + obj._id + '</a></td>';
 					if(obj.extensionattributes && obj.extensionattributes.login_mfa && obj.extensionattributes.login_mfa.allow_new_code === true){
-						jsontablehtml += '<td>  <a alt="delete" class="ts-cursor-pointer ts-dialog-delete" data-href="/auth/login-mfa/user/' + obj._id + '/disable_mfa" data-deleted-redirect-href="/auth/login-mfa">Disable MFA Setup</a>	</td>';
+						jsontablehtml += '<td>  <a alt="delete" class="ts-cursor-pointer ts-dialog-delete" data-href="'+request.originalurl+'/'+genericdoctypelink+'/' + obj._id + '/disable_mfa" data-deleted-redirect-href="'+request.originalurl+'">Disable MFA Setup</a>	</td>';
 
 					}
 					else if(obj.extensionattributes && obj.extensionattributes.login_mfa && obj.extensionattributes.login_mfa.allow_new_code === false){
-						jsontablehtml += '<td> <a alt="delete" class="ts-cursor-pointer ts-dialog-delete" data-href="/auth/login-mfa/user/' + obj._id + '/enable_mfa" data-deleted-redirect-href="/auth/login-mfa">Enable MFA Setup</a>	</td>';
+						jsontablehtml += '<td> <a alt="delete" class="ts-cursor-pointer ts-dialog-delete" data-href="'+request.originalurl+'/'+genericdoctypelink+'/' + obj._id + '/enable_mfa" data-deleted-redirect-href="'+request.originalurl+'">Enable MFA Setup</a>	</td>';
 
 					}
 					else{
@@ -53,9 +62,9 @@
 				}
 			},
 			custom_tfoot: locals.default_custom_tfoot({
-				total:users.length,
-				count:userscount,
-				pages:userpages,
+				total:genericdocs.length,
+				count:genericdoccount,
+				pages:genericdocpages,
 				currentlimit:request.query.limit,
 				currentpage:request.query.pagenum,
 				colspan: 9
