@@ -396,16 +396,17 @@ var userEditor = function(req,res,next){
 
 var set_mfa_status = function (req,res,next) {
 	req.controllerData = req.controllerData || {};
+	var controllerDataVariable = req.controllerData.login_mfa_user_variable || 'user';
 	req.controllerData.checkuservalidation = loginExtSettings.new_user_validation;
 	req.controllerData.checkuservalidation.useComplexity = loginExtSettings.complexitySettings.useComplexity;
 	req.controllerData.checkuservalidation.complexity = loginExtSettings.complexitySettings.settings.weak;
 
 	// req.body = req.controllerData.user;
-	req.body.docid = req.controllerData.user._id;
-	req.body.accounttype = req.controllerData.user.accounttype;
-	req.body.email = req.controllerData.user.email;
-	req.body.attributes = req.controllerData.user.attributes;
-	req.body.extensionattributes = req.controllerData.user.extensionattributes ||{};
+	req.body.docid = req.controllerData[controllerDataVariable]._id;
+	req.body.accounttype = req.controllerData[controllerDataVariable].accounttype;
+	req.body.email = req.controllerData[controllerDataVariable].email;
+	req.body.attributes = req.controllerData[controllerDataVariable].attributes;
+	req.body.extensionattributes = req.controllerData[controllerDataVariable].extensionattributes ||{};
 	if(req.params.set_mfa_status ==='enable_mfa'){
 		req.body.extensionattributes.login_mfa.allow_new_code = true;
 	}

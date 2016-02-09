@@ -12,8 +12,11 @@
   a[href="/p-admin/user/new"].async-admin-ajax-link.ts-button.ts-pull-right{
   	display: none;
   }
+  a[href="/p-admin/content/account/new"].async-admin-ajax-link.ts-button.ts-pull-right{
+  	display: none;
+  }
   </style>
-  <% if(locals.use_separate_accounts){ %>
+  <% if(locals.use_separate_accounts && request.originalurl !== '/p-auth/login-mfa'){ %>
 	  	<a class="async-admin-ajax-link ts-button  ts-pull-right" href="/p-auth/login-mfa">Manage Accounts MFA</a>
 	<% }; %>
     <% include ../../shared/admin_genericdoc_search_filters %>
