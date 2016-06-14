@@ -1,4 +1,8 @@
 'use strict';
+const fs = require('fs-extra');
+var login_mfa;
+var login_check;
+var login_idx;
 var asyncadminInstalled;
 /**
  * Login Multi Factor Authentication (MFA) uses Passportjs' passport_totp authentication stategy to provide TOTP(Time-based One-time Password Algorithm) for Express based periodicjs applications.
@@ -12,11 +16,6 @@ var asyncadminInstalled;
  */
 module.exports = function(periodic){
 	// express,app,logger,config,db,mongoose
-	var fs = require('fs-extra'),
-		login_mfa,
-		login_check,
-		login_idx;
-
 	periodic.app.controller.extension.login_mfa = require('./controller/login_mfa')(periodic);
 	periodic.app.controller.extension.login.auth.passport = periodic.app.controller.extension.login_mfa.passport;
 	periodic.app.controller.extension.login.auth.ensureAuthenticated = periodic.app.controller.extension.login_mfa.ensureAuthenticated;
@@ -28,7 +27,7 @@ module.exports = function(periodic){
 		if (periodic.settings.extconf.extensions[x].name === 'periodicjs.ext.login') {
  			if (periodic.settings.extconf.extensions[x+1].name !== 'periodicjs.ext.login_mfa') {
 				login_check = false;
-				console.log(login_check);
+				// console.log('login_check',login_check);
 				login_idx = x;
 			}
 		}
@@ -47,8 +46,8 @@ module.exports = function(periodic){
 			if (err) {
 				throw new Error(err);
 			} else {
-				console.log('Login_MFA moved - App Restarting');
-				periodic.core.utilities.restart_app();
+				periodic.logger.warn('Login_MFA (Multi-factor authentication) is out of order, fixing extensions.json and restarting Periodicjs');
+				periodic.core.utilities.restart_app({callback:function(){}});
 			}
 		});
 	}

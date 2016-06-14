@@ -1,40 +1,4 @@
 {
-  "_args": [
-    [
-      "periodicjs.ext.login_mfa@5.1.2",
-      "/Users/yawetse/Developer/github/promise/promise-internal-server/node_modules/periodicjs"
-    ],
-    [
-      "periodicjs.ext.login_mfa@5.2.0",
-      "/Users/yawetse/Developer/github/promise/promise-internal-server/node_modules/periodicjs"
-    ]
-  ],
-  "_from": "periodicjs.ext.login_mfa@latest",
-  "_id": "periodicjs.ext.login_mfa@7.0.0",
-  "_inCache": true,
-  "_installable": true,
-  "_location": "/periodicjs.ext.login_mfa",
-  "_nodeVersion": "4.2.4",
-  "_npmUser": {
-    "email": "yaw.etse@gmail.com",
-    "name": "yawetse"
-  },
-  "_npmVersion": "2.14.12",
-  "_phantomChildren": {},
-  "_requested": {
-    "name": "periodicjs.ext.login_mfa",
-    "raw": "periodicjs.ext.login_mfa@5.2.0",
-    "rawSpec": "5.2.0",
-    "scope": null,
-    "spec": "5.2.0",
-    "type": "version"
-  },
-  "_requiredBy": [
-    "#USER"
-  ],
-  "_shrinkwrap": null,
-  "_spec": "periodicjs.ext.login_mfa@5.2.0",
-  "_where": "/Users/yawetse/Developer/github/promise/promise-internal-server/node_modules/periodicjs",
   "author": {
     "name": "Yaw Joseph Etse",
     "email": "yaw.etse@gmail.com",
@@ -82,7 +46,7 @@
     "tarball": "http://registry.npmjs.org/periodicjs.ext.login_mfa/-/periodicjs.ext.login_mfa-5.2.0.tgz"
   },
   "engines": {
-    "node": ">=0.10.x"
+    "node": ">=6.x"
   },
   "gitHead": "375af6c55cb0f06266bef4fea8d98d6245cb9e43",
   "homepage": "https://github.com/typesettin/periodicjs.ext.login_mfa#readme",
@@ -107,6 +71,5 @@
     "postinstall": "node install.js",
     "postuninstall": "node uninstall.js"
   },
-  "version": "7.0.2",
-  "_shasum": "65155dff5912a6da8589fdd149b36138633fd056"
+  "version": "7.1.0"
 }
