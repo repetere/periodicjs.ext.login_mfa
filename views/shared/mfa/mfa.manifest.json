@@ -1,0 +1,102 @@
+{
+  "containers": {
+    "/mfa": {
+      "layout":{
+        "component": "Hero",
+        "props": {
+          "size": "isFullheight"
+        },
+        "children": [
+          {
+            "component": "HeroBody",
+            "props": {},
+            "children": [
+              {
+                "component": "Container",
+                "props": {},
+                "children": [
+                  {
+                    "component": "Columns",
+                    "children": [
+                      {
+                        "component": "Column",
+                        "props": {
+                          "size": "is3"
+                        }
+                      },
+                      {
+                        "component": "Column",
+                        "props": {},
+                        "children": [
+                          {
+                            "component": "Title",
+                            "props": {
+                              "style": {
+                                "textAlign": "center"
+                              }
+                            },
+                            "children": "Submit MFA Code"
+                          },
+                          {
+                            "component": "ResponsiveForm",
+                            "props": {
+                              "cardForm": true,
+                              "cardFormProps": {
+                                "isFullwidth": true
+                              },
+                              "onSubmit":"func:this.props.validateMFA",
+                              "footergroups": [
+                                {
+                                  "gridProps": {},
+                                  "formElements": [
+                                    {
+                                      "type": "submit",
+                                      "value": "Submit",
+                                      "name": "submit",
+                                      "passProps": {
+                                        "style": {
+                                          "color": "#1fc8db"
+                                        }
+                                      },
+                                      "layoutProps": {}
+                                    }]
+                                }
+                              ],
+                              "formgroups": [
+                                {
+                                  "gridProps": {},
+                                  "formElements": [
+                                    {
+                                      "type": "text",
+                                      "label": "Code",
+                                      "name": "code",
+                                      "layoutProps": {
+                                        "horizontalform": true
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "component": "Column",
+                        "props": {
+                          "size": "is3"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "resources": {  },
+      "onFinish":"render"
+    }
+  }
+}
