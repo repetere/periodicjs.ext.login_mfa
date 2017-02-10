@@ -1,20 +1,21 @@
 'use strict';
-var qr = require('qr-image');
-var	merge = require('utils-merge'),
-	TotpStrategy = require('passport-totp').Strategy,
-	base32 = require('thirty-two'),
-	capitalize = require('capitalize'),
-	// User,
-	passport,
-	loginExtSettings,
-	appSettings,
-	appenvironment,
-	mongoose,
-	logger,
-	CoreUtilities,
-	CoreController,
-	CoreMailer,
-	Custom_User_Objects={};
+const Promisie = require('promisie');
+const qr = require('qr-image');
+const merge = require('utils-merge');
+const base32 = require('thirty-two');
+const TotpStrategy = require('passport-totp').Strategy;
+const capitalize = require('capitalize');
+	
+var passport;
+var loginExtSettings;
+var appSettings;
+var appenvironment;
+var mongoose;
+var logger;
+var CoreUtilities;
+var CoreController;
+var CoreMailer;
+var Custom_User_Objects = {};
 
 /**
  * passport totp configuration
@@ -46,6 +47,19 @@ var totp_success = function(req,res){
 	req.session.secondFactor = 'totp';
 
 	res.redirect(loginUrl);
+};
+
+var authenticate_totp = function (req, res, next) {
+	let setStatus = function (result, status, data) {
+		return { result, status, data };
+	};
+	passport.authenticate('totp', (err, user, info) => {
+		if (err) res.status(500).send(setStatus('error', 500, { error: err.message, authenticated: false }));
+		else {
+			if (!user) res.status(401).send(setStatus('error', 401, { error: 'Unauthorized - Invalid MFA', authenticated: false }));
+			else res.status(200).send(setStatus('success', 200, { authenticated: true }));
+		}
+	})(req, res, next);
 };
 
 /**
@@ -90,7 +104,7 @@ var findKeyForUserId =  function(user, fn) {
  * @param  {object}   keydata object that contains, key (MFA device key),period (TOTP timeout period) and allow_new_code (set to false)
  * @param  {Function} cb      callback function
  */
-var saveKeyForUserId = function(userid, keydata, modelNameToUse, cb) {
+var saveKeyForUserId = function (userid, keydata, modelNameToUse, cb) {
 	let UserModelToUse = Custom_User_Objects[modelNameToUse];
 	UserModelToUse.findOne({
 		'_id': userid
@@ -104,15 +118,70 @@ var saveKeyForUserId = function(userid, keydata, modelNameToUse, cb) {
 			user.extensionattributes = user.extensionattributes || {};
 			user.extensionattributes.login_mfa = keydata;
 			user.extensionattributes.login_mfa.allow_new_code = false;
-
 			user.save(function (err, usr) {
-				if (err) {
-					cb(err, null);
-				}
-				cb(null, usr);
+				if (err) cb(err, null);
+				else cb(null, usr);
 			});
 		}
 	});
+};
+
+var findUserForMFASetup = function (req, res) {
+	if (!Custom_User_Objects[req.user.entitytype]) Custom_User_Objects[req.user.entitytype] = mongoose.model(capitalize(req.user.entitytype));
+	return Promisie.promisify(findKeyForUserId)(req.user)
+		.then(data => {
+			return [req.user, data];
+		}, e => Promisie.reject(e));
+};
+
+var generateMFAKey = function (user, data) {
+	let encoded = (data.key) ? base32.encode(data.key) : base32.encode(randomKey(10));
+	let otpurl = `otpauth://totp/${ user.email }?secret=${ encoded }&period=${ data.period || 30 }&issuer=${ encodeURIComponent(appSettings.name) }`;
+	let svg_string = qr.imageSync((otpUrl), { type: 'svg' });
+	let image = `https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=${ encodeURIComponent(opturl) }`;
+	return {
+		user,
+		saveUser: (!data.key),
+		key: encoded, 
+		qr_image: image,
+		svg_string
+	};
+};
+
+var handleKeyGeneration = function (user, data) {
+	if (data && data.key) {
+		if (data.allow_new_code !== true) return Promisie.reject(new Error('User is not eligible for a new mfa token setup, please contact your admin'));
+	}
+	return generateMFAKey(user, data);
+};
+
+var saveMFAToUser = function (options = {}) {
+	if (!options.saveUser) return options;
+	return Promisie.promisify(saveKeyForUserId)(options.user, { key: options.key, period: 30 }, options.user.entitytype)
+		.then(() => options)
+		.catch(e => Promisie.reject(e));
+};
+
+var mfa_setup = function (req, res) {
+	let adminPostRoute = res.locals.adminPostRoute || 'auth';
+	findUserForMFASetup(req, res)
+		.spread(handleKeyGeneration)
+		.then(saveMFAToUser)
+		.then(result => {
+			return {
+				pagedata: {
+					title: 'Multi-Factor Authenticator Setup',
+					toplink: '&raquo; Multi-Factor Authenticator Setup',
+					extensions: CoreUtilities.getAdminMenu()
+				},
+				key: result.key, 
+				qrImage: result.qr_image,
+				svg_string: result.svg_string, 
+				user: req.user,
+				adminPostRoute: adminPostRoute
+			};
+		})
+		.catch(e => Promisie.reject(e));
 };
 
 /**
@@ -123,104 +192,21 @@ var saveKeyForUserId = function(userid, keydata, modelNameToUse, cb) {
  */
 var mfa_setup_page = function(req,res){
 	// console.log('req.user',req.user);
-	if(!Custom_User_Objects[req.user.entitytype]){
-		Custom_User_Objects[req.user.entitytype] = mongoose.model(capitalize(req.user.entitytype));
-	}
-	let adminPostRoute = res.locals.adminPostRoute || 'auth';
-	var otpUrl,qrImage,encodedKey;
-	findKeyForUserId(req.user, function(err, obj) {
-    if (err) { 
+	mfa_setup(req, res)
+		.then(result => {
+			CoreController.renderView(req, res, {
+				viewname: 'user/login-mfa-setup',
+				themefileext: appSettings.templatefileextension,
+				extname: 'periodicjs.ext.login_mfa'
+			}, result);
+		}, e => {
+			logger.error('MFA Setup Error', e);
 			CoreController.handleDocumentQueryErrorResponse({
-				err: err,
+				err: e,
 				res: res,
 				req: req
 			});
-		}
-   else if (obj && obj.key) {
-   		if(obj.allow_new_code!==true){
-   			var mfaError = new Error('User is not accessible to new mfa token setup, please contact your admin');
-   			logger.error(mfaError);
-   			CoreController.handleDocumentQueryErrorResponse({
-					err: mfaError,
-					res: res,
-					req: req
-				});
-   		}
-   		else{
-      // two-factor auth has already been setup
-      encodedKey = base32.encode(obj.key);
-      
-      // generate QR code for scanning into Google Authenticator
-      // reference: https://code.google.com/p/google-authenticator/wiki/KeyUriFormat
-      otpUrl = 'otpauth://totp/' + req.user.email + '?secret=' + encodedKey + '&period=' + (obj.period || 30)+'&issuer='+encodeURIComponent(appSettings.name);
-var svg_string = qr.imageSync((otpUrl), { type: 'svg' });
-
-      qrImage = 'https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=' + encodeURIComponent(otpUrl);
-      
-      var viewtemplate = {
-					viewname: 'user/login-mfa-setup',
-					themefileext: appSettings.templatefileextension,
-					extname: 'periodicjs.ext.login_mfa'
-				},
-				viewdata = {
-					pagedata: {
-						title: 'Multi-Factor Authenticator Setup',
-						toplink: '&raquo; Multi-Factor Authenticator Setup',
-						extensions: CoreUtilities.getAdminMenu()
-					},
-					key: encodedKey, 
-					qrImage: qrImage,
-					svg_string: svg_string, 
-					user: req.user,
-					adminPostRoute: adminPostRoute
-				};
-
-			CoreController.renderView(req, res, viewtemplate, viewdata);
-   		}
-    } 
-    else {
-      // new two-factor setup.  generate and save a secret key
-      var key = randomKey(10);
-      encodedKey = base32.encode(key);
-      
-      // generate QR code for scanning into Google Authenticator
-      // reference: https://code.google.com/p/google-authenticator/wiki/KeyUriFormat
-      otpUrl = 'otpauth://totp/' + req.user.email + '?secret=' + encodedKey + '&period=30&issuer='+encodeURIComponent(appSettings.name);
-var new_svg_string = qr.imageSync((otpUrl), { type: 'svg' });
-      qrImage = 'https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=' + encodeURIComponent(otpUrl);
-  
-      saveKeyForUserId(req.user, { key: key, period: 30 }, req.user.entitytype, function(err) {
-        if (err) { 
-        	CoreController.handleDocumentQueryErrorResponse({
-						err: err,
-						res: res,
-						req: req
-					});
-        }
-        else{
-	    		var viewtemplate = {
-							viewname: 'user/login-mfa-setup',
-							themefileext: appSettings.templatefileextension,
-							extname: 'periodicjs.ext.login_mfa'
-						},
-						viewdata = {
-							pagedata: {
-								title: 'Multi-Factor Authenticator Setup',
-								toplink: '&raquo; Multi-Factor Authenticator Setup',
-								extensions: CoreUtilities.getAdminMenu()
-							},
-							key: encodedKey, 
-							qrImage: qrImage, 
-							svg_string: new_svg_string,
-							user: req.user,
-							adminPostRoute: adminPostRoute
-						};
-
-					CoreController.renderView(req, res, viewtemplate, viewdata);
-        }
-      });
-    }
-  });
+		});
 };
 
 /**
@@ -449,7 +435,6 @@ var controller = function(resources){
 	};
 	// User = mongoose.model('User');
 
-
 	passport.use(new TotpStrategy(
 	  function(user, done) {
 	    // setup function, supply key and period to done callback
@@ -464,7 +449,6 @@ var controller = function(resources){
 	  }
 	));
 
-
 	return{
 		passport: passport,
 		totp_callback: totp_callback,
@@ -474,7 +458,9 @@ var controller = function(resources){
 		mfa_setup_page: mfa_setup_page,
 		userEditor: userEditor,
 		set_mfa_status: set_mfa_status,
-		ensureAuthenticated: ensureAuthenticated
+		ensureAuthenticated: ensureAuthenticated,
+		authenticate_totp,
+		mfa_setup
 	};
 };
 
