@@ -1,11 +1,16 @@
 {
-	"periodicCompatibility":"5.0.0",
-	"periodicDependencies": [    
-	{
+  "periodicCompatibility":"5.0.0",
+  "periodicDependencies": [    
+    {
       "extname":"periodicjs.ext.login",
       "version":"~5.9.9"
     }
-    ],
+  ],
+	"periodicjs.ext.reactadmin": {
+          "manifests":[
+            "node_modules/periodicjs.ext.login_mfa/views/shared/mfa"
+          ]
+        },
 	"periodicjs.ext.asyncadmin": {
 		"menu": {
 			"Extensions": {
