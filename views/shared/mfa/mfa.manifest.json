@@ -40,6 +40,20 @@
                           {
                             "component": "ResponsiveForm",
                             "props": {
+                              "validations": [{
+                                "name": "code",
+                                "constraints": {
+                                  "code": {
+                                    "presence": {
+                                      "message": "is required"
+                                    },
+                                    "length": {
+                                      "minimum": 6,
+                                      "message": "must be at least 6 digits"
+                                    }
+                                  }
+                                }
+                              }],
                               "cardForm": true,
                               "cardFormProps": {
                                 "isFullwidth": true
