@@ -69,6 +69,7 @@
                                     {
                                       "type": "text",
                                       "label": "Code",
+                                      "submitOnEnter": true,
                                       "name": "code",
                                       "layoutProps": {
                                         "horizontalform": true
