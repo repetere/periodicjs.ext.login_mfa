@@ -7,13 +7,11 @@
   "bugs": {
     "url": "https://github.com/typesettin/periodicjs.ext.login_mfa/issues"
   },
-  "contributors": [
-    {
-      "name": "Jan Bialostok",
-      "email": "janbialostok@gmail.com",
-      "url": "https://github.com/janbialostok"
-    }
-  ],
+  "contributors": [{
+    "name": "Jan Bialostok",
+    "email": "janbialostok@gmail.com",
+    "url": "https://github.com/janbialostok"
+  }],
   "dependencies": {
     "passport-totp": "0.0.2",
     "qr-image": "^3.1.0",
@@ -43,8 +41,8 @@
   },
   "directories": {},
   "dist": {
-    "shasum": "a58879425eb3a1ae91fefbac28e8b406d81bdc15",
-    "tarball": "http://registry.npmjs.org/periodicjs.ext.login_mfa/-/periodicjs.ext.login_mfa-5.2.0.tgz"
+    "shasum": "a703f5ded50f273bd4f883111c8a7333b0f763e4",
+    "tarball": "https://registry.npmjs.org/periodicjs.ext.login_mfa/-/periodicjs.ext.login_mfa-7.2.2.tgz"
   },
   "engines": {
     "node": ">=6.x"
@@ -55,7 +53,10 @@
     "periodicjs"
   ],
   "main": "index.js",
-  "maintainers": [
+  "maintainers": [{
+      "name": "janbialostok",
+      "email": "janbialostok@gmail.com"
+    },
     {
       "name": "yawetse",
       "email": "yaw.etse@gmail.com"
@@ -72,5 +73,5 @@
     "postinstall": "node install.js",
     "postuninstall": "node uninstall.js"
   },
-  "version": "7.2.2"
+  "version": "9.0.0"
 }

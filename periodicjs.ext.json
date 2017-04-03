@@ -1,32 +1,30 @@
 {
-	"periodicCompatibility":"5.0.0",
-	"periodicDependencies": [    
-		{
-			"extname":"periodicjs.ext.login",
-			"version":"~5.9.9"
-		}
-	],
-	"periodicjs.ext.reactadmin": {
-		"manifests":[
-			"node_modules/periodicjs.ext.login_mfa/views/shared/mfa"
-		]
-	},
-	"periodicjs.ext.asyncadmin": {
-		"menu": {
-			"Extensions": {
-				"mfa": {
-					"userprivilege":"110",
-					"tree-item": "file",
-					"tree-item-label": "Multi-Factor Authentication",
-					"tree-item-id": "ext.login-mfa",
-					"tree-item-link": "/auth/login-mfa",
-					"tree-item-attributes": {
-						"class": "async-admin-ajax-link",
-						"title": "Login MFA",
-						"style": "background-image: url(/images/adminui/svg/shield89.svg);"
-					}
-				}
-			}
-		}
-	}
+  "periodicCompatibility": "9.0.0",
+  "periodicDependencies": [{
+    "extname": "periodicjs.ext.login",
+    "version": "~5.9.9"
+  }],
+  "periodicjs.ext.reactadmin": {
+    "manifests": [
+      "node_modules/periodicjs.ext.login_mfa/views/reactadmin/manifests"
+    ]
+  },
+  "periodicjs.ext.asyncadmin": {
+    "menu": {
+      "Extensions": {
+        "mfa": {
+          "userprivilege": "110",
+          "tree-item": "file",
+          "tree-item-label": "Multi-Factor Authentication",
+          "tree-item-id": "ext.login-mfa",
+          "tree-item-link": "/auth/login-mfa",
+          "tree-item-attributes": {
+            "class": "async-admin-ajax-link",
+            "title": "Login MFA",
+            "style": "background-image: url(/images/adminui/svg/shield89.svg);"
+          }
+        }
+      }
+    }
+  }
 }
