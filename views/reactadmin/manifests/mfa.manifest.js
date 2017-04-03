@@ -51,6 +51,7 @@ module.exports = (periodic) => {
                       }
                     }],
                     "cardForm": true,
+                    // "cardFormTitle":"Enter One Time Password",
                     "cardFormProps": {
                       "isFullwidth": true
                     },
@@ -76,12 +77,52 @@ module.exports = (periodic) => {
                         "label": "Code",
                         "submitOnEnter": true,
                         "name": "code",
+                        passProps: {
+                          maxLength:6,
+                        },
                         "layoutProps": {
                           "horizontalform": true
                         }
                       }]
                     }]
                   }
+                },
+                {
+                  component: 'Section',
+                  thisprops: {
+                    user: [ 'user' ]
+                  },
+                  comparisonprops: [
+                    {
+                      left: [ 'user', 'userdata', 'extensionattributes', 'login_mfa', 'allow_new_code' ],
+                      operation: 'eq',
+                      right:true,
+                    }
+                  ],
+                  children: [
+                    {
+                      component: 'p',
+                      children: [
+                        // {
+                        //   component: 'hr',
+                        // },
+                        {
+                          component: 'span',
+                          children: 'Please configure your MFA Device'
+                        },
+                        {
+                          component: 'Link',
+                          props: {
+                            to: `${reactadmin.manifest_prefix}auth/login-otp-setup`,
+                            style: {
+                              marginLeft:'5px'
+                            }
+                          },
+                          children: 'Multi-factor device setup'
+                        },
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -110,6 +151,17 @@ module.exports = (periodic) => {
         },
       },
       [`${reactadmin.manifest_prefix}mfa`]: {
+        "layout": mfaLayout,
+        "resources": {
+          // mfadata: '/auth/login-otp-setup-async',
+        },
+        "onFinish": "render",
+        'pageData': {
+          'title': 'Multi-Factor Authentication',
+          'navLabel': 'Multi-Factor Authentication',
+        },
+      },
+      ['/mfa']: {
         "layout": mfaLayout,
         "resources": {
           // mfadata: '/auth/login-otp-setup-async',

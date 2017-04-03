@@ -7,11 +7,13 @@
   "bugs": {
     "url": "https://github.com/typesettin/periodicjs.ext.login_mfa/issues"
   },
-  "contributors": [{
-    "name": "Jan Bialostok",
-    "email": "janbialostok@gmail.com",
-    "url": "https://github.com/janbialostok"
-  }],
+  "contributors": [
+    {
+      "name": "Jan Bialostok",
+      "email": "janbialostok@gmail.com",
+      "url": "https://github.com/janbialostok"
+    }
+  ],
   "dependencies": {
     "passport-totp": "0.0.2",
     "qr-image": "^3.1.0",
@@ -41,8 +43,8 @@
   },
   "directories": {},
   "dist": {
-    "shasum": "a703f5ded50f273bd4f883111c8a7333b0f763e4",
-    "tarball": "https://registry.npmjs.org/periodicjs.ext.login_mfa/-/periodicjs.ext.login_mfa-7.2.2.tgz"
+    "shasum": "88e3e4f74b8b376f8f6acd8ce0c4ff810fe3f85c",
+    "tarball": "https://registry.npmjs.org/periodicjs.ext.login_mfa/-/periodicjs.ext.login_mfa-9.0.0.tgz"
   },
   "engines": {
     "node": ">=6.x"
@@ -53,7 +55,8 @@
     "periodicjs"
   ],
   "main": "index.js",
-  "maintainers": [{
+  "maintainers": [
+    {
       "name": "janbialostok",
       "email": "janbialostok@gmail.com"
     },
@@ -73,5 +76,5 @@
     "postinstall": "node install.js",
     "postuninstall": "node uninstall.js"
   },
-  "version": "9.0.0"
+  "version": "9.0.1"
 }
